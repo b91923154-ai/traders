@@ -1,13 +1,30 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { GlassCard } from '../components/ui/GlassCard';
 import { ArrowRight, Mail, MapPin, Phone } from 'lucide-react';
 import { StrobeText } from '../components/StrobeText';
 import { GlitchHoverCard } from '../components/GlitchHoverCard';
 import { MagneticIcon } from '../components/MagneticIcon';
+import { useEffect } from 'react';
 
 export default function Home() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [location]);
+
   return (
     <div
       className="min-h-screen text-foreground font-sans relative"
@@ -26,11 +43,11 @@ export default function Home() {
             </div>
 
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-16 bg-white/10 backdrop-blur-md border border-white/10 px-12 py-2.5 rounded-full shadow-lg z-10">
-              <a href="#home" className="text-sm font-medium hover:text-white transition-colors text-white">Home</a>
+              <Link to="/#home" className="text-sm font-medium hover:text-white transition-colors text-white">Home</Link>
               <Link to="/course" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Course</Link>
-              <a href="#about" className="text-sm font-medium text-white/70 hover:text-white transition-colors">About</a>
-              <a href="#faq" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Help</a>
-              <a href="#contact" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Contact</a>
+              <Link to="/#team" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Team</Link>
+              <Link to="/#faq" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Help</Link>
+              <Link to="/#contact" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Contact</Link>
             </div>
             <div className="flex items-center space-x-2 md:space-x-4 z-10">
               <Link to="/login" className="text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 md:px-6 md:py-3 rounded-full text-white/80 hover:text-white transition-colors shadow-lg">Register/Login</Link>
@@ -174,7 +191,7 @@ export default function Home() {
         </section>
 
         {/* Method Section */}
-        <section id="method" className="py-24 relative border-b border-white/5">
+        <section id="method" className="pt-24 pb-[50vh] relative border-b border-white/5">
           <div className="max-w-7xl mx-auto px-4">
             <div className="mb-16">
               <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">The framework</span>
@@ -182,27 +199,35 @@ export default function Home() {
               <p className="text-gray-400 mt-4 max-w-md">T4 isn't a slogan — it's the sequence every course, drill, and live session is built around, in order.</p>
             </div>
 
-            <div className="space-y-0">
+            <div className="space-y-6">
               {[
                 { num: "T1", tag: "Timing", title: "Read price before you read headlines.", desc: "Candlestick structure, volume confirmation, and session timing — the raw inputs that tell you when a move is actually starting, not just when it's already visible." },
                 { num: "T2", tag: "Trend", title: "Trade with the current, not against it.", desc: "Multi-timeframe trend mapping, moving average confluence, and structure breaks — so you know which direction has the odds, before you open a position." },
                 { num: "T3", tag: "Trigger", title: "Rules decide. You just execute.", desc: "Rules-based entry and exit triggers with pre-defined risk per trade — removing the split-second emotional decisions that cost most beginners their edge." },
                 { num: "T4", tag: "Target", title: "Know your exit before your entry.", desc: "Position sizing, scaling out, and portfolio-level targets — the discipline layer that turns single winning trades into a compounding, repeatable process." }
               ].map((method, i) => (
-                <GlitchHoverCard 
-                  key={i} 
-                  className="sticky grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 md:gap-8 items-center py-8 md:py-12 border-t border-white/10 group px-4 md:px-6 rounded-2xl text-center md:text-left bg-black/80 backdrop-blur-md shadow-[0_-10px_30px_rgba(0,0,0,0.5)] border border-white/10"
-                  style={{ top: `calc(100px + ${i * 40}px)`, zIndex: i + 10 }}
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  className="sticky"
+                  style={{ top: `calc(100px + ${i * 100}px)`, zIndex: i + 10 }}
                 >
-                  <div className="text-[4rem] md:text-[7rem] font-serif font-bold text-transparent transition-all duration-500" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.2)' }}>
-                    <span className="group-hover:text-primary transition-colors duration-500" style={{ WebkitTextStroke: '0' }}>{method.num}</span>
-                  </div>
-                  <div>
-                    <span className="text-primary font-mono text-xs tracking-widest uppercase mb-3 block">{method.tag}</span>
-                    <h3 className="text-2xl md:text-3xl font-bold mb-4">{method.title}</h3>
-                    <p className="text-gray-400 max-w-xl">{method.desc}</p>
-                  </div>
-                </GlitchHoverCard>
+                  <GlitchHoverCard
+                    className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 md:gap-8 items-center py-8 md:py-12 border-t border-white/10 group px-4 md:px-6 rounded-2xl text-center md:text-left bg-black/80 backdrop-blur-md shadow-[0_-10px_30px_rgba(0,0,0,0.5)] border border-white/10"
+                  >
+                    <div className="text-[4rem] md:text-[7rem] font-serif font-bold text-transparent transition-all duration-500" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.2)' }}>
+                      <span className="group-hover:text-primary transition-colors duration-500" style={{ WebkitTextStroke: '0' }}>{method.num}</span>
+                    </div>
+                    <div>
+                      <span className="text-primary font-mono text-xs tracking-widest uppercase mb-3 block">{method.tag}</span>
+                      <h3 className="text-2xl md:text-3xl font-bold mb-4">{method.title}</h3>
+                      <p className="text-gray-400 max-w-xl">{method.desc}</p>
+                    </div>
+                  </GlitchHoverCard>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -213,7 +238,7 @@ export default function Home() {
         {/* About Section */}
         <section id="about" className="py-24 relative overflow-hidden bg-black/40 border-y border-white/5 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="grid md:grid-cols-2 gap-16 items-stretch">
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -226,9 +251,7 @@ export default function Home() {
                 <p className="text-gray-400 mb-6 leading-relaxed">
                   T4 Traders is a professional trading education institute dedicated to helping individuals understand financial markets through practical, structured, and industry-focused learning. We provide both online and offline training programs designed for beginners as well as experienced traders.
                 </p>
-                <p className="text-gray-400 mb-12 leading-relaxed">
-                  <strong className="text-white">Our mission</strong> is to make quality trading education accessible while promoting disciplined decision-making, effective risk management, and continuous learning.
-                </p>
+
 
                 <div className="space-y-8 relative pl-8 border-l border-white/10">
                   <div className="relative">
@@ -452,8 +475,8 @@ export default function Home() {
             <div>
               <h4 className="font-bold mb-6 text-white">Company</h4>
               <ul className="space-y-3 text-sm text-gray-500">
-                <li><a href="#about" className="hover:text-primary transition-colors">About Us</a></li>
-                <li><a href="#team" className="hover:text-primary transition-colors">Our Team</a></li>
+                <li><Link to="/#about" className="hover:text-primary transition-colors">About Us</Link></li>
+                <li><Link to="/#team" className="hover:text-primary transition-colors">Our Team</Link></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Careers</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Contact</a></li>
               </ul>

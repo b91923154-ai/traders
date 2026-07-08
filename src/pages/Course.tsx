@@ -25,7 +25,7 @@ export default function Course() {
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-16 bg-white/10 backdrop-blur-md border border-white/10 px-12 py-2.5 rounded-full shadow-lg z-10">
               <Link to="/" className="text-sm font-medium hover:text-white transition-colors text-white/70">Home</Link>
               <Link to="/course" className="text-sm font-medium text-white hover:text-white transition-colors">Course</Link>
-              <Link to="/#about" className="text-sm font-medium text-white/70 hover:text-white transition-colors">About</Link>
+              <Link to="/#team" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Team</Link>
               <Link to="/#faq" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Help</Link>
               <Link to="/#contact" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Contact</Link>
             </div>
@@ -81,8 +81,11 @@ export default function Course() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: i * 0.1 }}
+                    className="relative h-full group"
                   >
-                    <GlassCard glow className="flex flex-col h-full bg-white/5 border-white/10 hover:border-primary/50 transition-colors">
+                    <div className="animated-border-box-glow"></div>
+                    <div className="animated-border-box"></div>
+                    <GlassCard glow className="relative z-10 flex flex-col h-full bg-transparent border-0 shadow-none hover:shadow-none hover:border-transparent">
                       <h3 className="text-2xl font-bold mb-2">{course.title}</h3>
                       <p className="text-sm text-gray-400 mb-6 flex-grow">{course.desc}</p>
                       <ul className="space-y-3 mb-8">
