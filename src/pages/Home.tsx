@@ -676,7 +676,7 @@ export default function Home() {
         </section>
 
         {/* Team Section */}
-        <section id="team" className="py-24 relative">
+        <section id="team" className="py-24 relative" >
           <div className="max-w-7xl mx-auto px-4 overflow-hidden">
             <h2 className="text-3xl font-bold mb-12 text-center">
               Meet Our <span className="text-primary">Team</span>
@@ -705,25 +705,6 @@ export default function Home() {
                       got from this Coaching. Helping students since 2018.
                     </p>
                   </div>
-                </GlassCard>
-              ))}
-            </div>
-
-            <h3 className="text-xl font-semibold mb-6 text-gray-400 border-b border-white/10 pb-2">
-              Technical Team
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <GlassCard key={i} className="text-center p-4">
-                  <div className="w-20 h-20 rounded-full bg-white/10 mx-auto mb-4 border border-white/20 overflow-hidden">
-                    <img
-                      src={`https://i.pravatar.cc/150?img=${i + 20}`}
-                      alt="Tech Member"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h4 className="font-bold text-sm">Tech Member {i}</h4>
-                  <p className="text-gray-500 text-xs">Support Analyst</p>
                 </GlassCard>
               ))}
             </div>
