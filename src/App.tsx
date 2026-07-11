@@ -6,7 +6,7 @@ import Register from "./pages/Register";
 import Consultation from "./pages/Consultation";
 import FreeTrial from "./pages/FreeTrial";
 import Course from "./pages/Course";
-import Dashboard from "./pages/Dashboard";
+import ResetPassword from "./pages/ResetPassword";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -21,18 +21,18 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/consultation" element={<Consultation />} />
         <Route path="/free-trial" element={<FreeTrial />} />
-        <Route path="/course" element={<Course />} />
 
         {/* Protected Route */}
 
         <Route
-          path="/dashboard"
+          path="/course"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Course />
             </ProtectedRoute>
           }
         />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

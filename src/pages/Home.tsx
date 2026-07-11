@@ -151,14 +151,6 @@ export default function Home() {
                   Register/Login
                 </Link>
               )}
-              <Link to="/free-trial">
-                <Button
-                  variant="outline"
-                  className="px-4 py-2 md:px-6 md:py-3 h-auto text-xs md:text-sm bg-transparent border-white/40 text-white hover:bg-white/10 rounded-full font-medium transition-colors"
-                >
-                  Free Trial
-                </Button>
-              </Link>
             </div>
           </div>
         </nav>
@@ -218,8 +210,12 @@ export default function Home() {
           {/* Ticker Tape */}
           <div className="absolute bottom-10 left-0 right-0 z-10 overflow-hidden flex py-4 border-y border-white/5 bg-background/50 backdrop-blur-sm">
             <motion.div
-              animate={{ x: [10, -500] }}
-              transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+              animate={{ x: ["0%", "-50%"] }}
+              transition={{
+                repeat: Infinity,
+                duration: 100,
+                ease: "linear",
+              }}
               className="flex space-x-8 whitespace-nowrap text-sm tracking-widest font-mono"
             >
               {[
@@ -317,23 +313,31 @@ export default function Home() {
         {/* Word Marquee Section */}
         <section className="py-6 border-b border-white/5 overflow-hidden">
           <motion.div
-            animate={{ x: [-100, 1000] }}
-            transition={{ repeat: Infinity, duration: 70, ease: "linear" }}
-            className="flex space-x-12 whitespace-nowrap text-gray-500 font-mono font-bold uppercase tracking-widest text-sm"
+            animate={{ x: ["-20%", "0%"] }}
+            transition={{
+              repeat: Infinity,
+              duration: 40,
+              ease: "linear",
+            }}
+            className="flex whitespace-nowrap text-gray-500 font-mono font-bold uppercase tracking-widest text-sm"
           >
-            {[...Array(6)].map((_, i) => (
-              <span key={i} className="flex items-center space-x-12">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="flex space-x-12 mr-12">
                 <span>SMC</span>
                 <span className="text-primary text-xs">✦</span>
+
                 <span>Price Action</span>
                 <span className="text-primary text-xs">✦</span>
+
                 <span>Psychology of Market</span>
                 <span className="text-primary text-xs">✦</span>
+
                 <span>Risk Management</span>
                 <span className="text-primary text-xs">✦</span>
+
                 <span>Advanced Concept (MSNR)</span>
                 <span className="text-primary text-xs">✦</span>
-              </span>
+              </div>
             ))}
           </motion.div>
         </section>

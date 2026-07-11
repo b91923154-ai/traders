@@ -10,6 +10,28 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const handleForgotPassword = async () => {
+    const cleanEmail = email.trim().toLowerCase();
+
+    console.log("Reset Email:", cleanEmail);
+
+    if (!cleanEmail) {
+      alert("Please enter your email first.");
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail);
+
+    console.log("Reset Error:", error);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Password reset link sent.");
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -24,6 +46,7 @@ export default function Login() {
       email: email.trim().toLowerCase(),
       password,
     });
+    console.log("Login Session:", data.session);
 
     setLoading(false);
 
@@ -74,6 +97,17 @@ export default function Login() {
               placeholder="Enter your password"
             />
           </div>
+
+          <div className="text-right">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-sm text-primary hover:underline"
+            >
+              Forgot Password?
+            </button>
+          </div>
+
           <Button type="submit" className="w-full mt-6" disabled={loading}>
             {loading ? "Logging In..." : "Login"}
           </Button>
