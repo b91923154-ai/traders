@@ -3,13 +3,11 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { GlassCard } from '../components/ui/GlassCard';
 import { CheckCircle2, ArrowRight, Mail, MapPin, Phone } from 'lucide-react';
+import { MobileMenu } from '../components/MobileMenu';
 
 export default function Course() {
   return (
-    <div
-      className="min-h-screen text-foreground font-sans relative"
-      style={{ backgroundImage: "url('/bg.png')", backgroundSize: '100% auto', backgroundPosition: 'center -150px', backgroundAttachment: 'fixed' }}
-    >
+    <div className="min-h-screen text-foreground font-sans relative page-hero-bg">
       <div className="absolute inset-0 bg-black/60 z-0 pointer-events-none"></div>
 
       <div className="relative z-10">
@@ -30,10 +28,26 @@ export default function Course() {
               <Link to="/#footer" className="text-sm font-medium text-white/70 hover:text-white transition-colors">Contact</Link>
             </div>
             <div className="flex items-center space-x-2 md:space-x-4 z-10">
-              <Link to="/login" className="text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 md:px-6 md:py-3 rounded-full text-white/80 hover:text-white transition-colors shadow-lg">Register/Login</Link>
+              <Link to="/login" className="hidden sm:inline-block text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 md:px-6 md:py-3 rounded-full text-white/80 hover:text-white transition-colors shadow-lg">Register/Login</Link>
               <Link to="/free-trial">
                 <Button variant="outline" className="px-4 py-2 md:px-6 md:py-3 h-auto text-xs md:text-sm bg-transparent border-white/40 text-white hover:bg-white/10 rounded-full font-medium transition-colors">Free Trial</Button>
               </Link>
+
+              <MobileMenu
+                links={[
+                  { label: "Home", to: "/" },
+                  { label: "Course", to: "/course" },
+                  { label: "FAQs", to: "/#faq" },
+                  { label: "Contact", to: "/#footer" },
+                ]}
+              >
+                <Link
+                  to="/login"
+                  className="sm:hidden text-center text-sm font-medium bg-white/5 border border-white/10 px-4 py-3 rounded-full text-white/80 hover:text-white transition-colors"
+                >
+                  Register/Login
+                </Link>
+              </MobileMenu>
             </div>
           </div>
         </nav>
@@ -47,7 +61,7 @@ export default function Course() {
                 <p className="text-gray-400 max-w-2xl mx-auto">Choose the learning path that matches your experience. Whether you're just starting or looking to master advanced trading strategies.</p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-8">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[
                   {
                     title: "SMC (Smart Money Concepts)",

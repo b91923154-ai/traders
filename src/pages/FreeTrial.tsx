@@ -6,10 +6,7 @@ import { ArrowLeft, Send } from 'lucide-react';
 
 export default function FreeTrial() {
   return (
-    <div
-      className="min-h-screen text-foreground font-sans relative flex flex-col"
-      style={{ backgroundImage: "url('/bg.png')", backgroundSize: '100% auto', backgroundPosition: 'center -150px', backgroundAttachment: 'fixed' }}
-    >
+    <div className="min-h-screen text-foreground font-sans relative flex flex-col page-hero-bg">
       <div className="absolute inset-0 bg-black/70 z-0 pointer-events-none"></div>
 
       {/* Navigation */}
@@ -38,7 +35,7 @@ export default function FreeTrial() {
             <p className="text-gray-400">Experience the T4 Method with no obligations. Fill out the form below and our team will grant you access to a sample session.</p>
           </div>
 
-          <GlassCard className="p-8 md:p-12 bg-white/5 border-white/10 shadow-2xl">
+          <GlassCard className="p-6 sm:p-8 md:p-12 bg-white/5 border-white/10 shadow-2xl">
             <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
               <div className="space-y-2">
                 <label htmlFor="name" className="text-sm font-medium text-gray-300">Full Name</label>

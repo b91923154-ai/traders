@@ -2,9 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Monigue';
+  src: url('/fonts/monigue-demo.regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aliey';
+  src: url('/fonts/Aliey-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Belgin';
+  src: url('/fonts/belgin.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
   --background: #040d06;
   --foreground: #ffffff;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
@@ -15,6 +41,32 @@ body {
   padding: 0;
   user-select: none;
   -webkit-user-select: none;
+}
+
+/* Shared page background treatments (used instead of inline styles so we can
+   safely override background-attachment on smaller screens). iOS Safari in
+   particular renders `background-attachment: fixed` poorly/janks on scroll,
+   so it is disabled below the tablet breakpoint. */
+.page-hero-bg {
+  background-image: url("/bg.png");
+  background-size: 100% auto;
+  background-position: center -150px;
+  background-attachment: fixed;
+}
+
+.page-cover-bg {
+  background-image: url("/bg.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+
+
+@media (max-width: 640px) {
+  .page-hero-bg {
+    background-position: center -60px;
+  }
 }
 
 /* Custom scrollbar to match sleek theme */
@@ -93,4 +145,23 @@ body {
   100% {
     transform: translate(-50%, -50%) rotate(1turn);
   }
+}
+
+.projects-stack-container {
+  position: relative;
+  height: 340px;
+  margin: 0 auto 120px;
+  width: 100%;
+}
+
+.project-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-radius: 20px;
+  height: 340px;
+  overflow: hidden;
+  transform: translateY(100%); /* starting position — off-screen below */
+  will-change: transform;
 }
