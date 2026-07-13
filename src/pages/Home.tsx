@@ -5,10 +5,17 @@ import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
 import { StrobeText } from "../components/StrobeText";
 import { GlitchHoverCard } from "../components/GlitchHoverCard";
 import { MagneticIcon } from "../components/MagneticIcon";
+import { MobileMenu } from "../components/MobileMenu";
 
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { UserProfile } from "../components/ui/UserProfile";
+import { HalftoneBackground } from "../components/ui/HalftoneBackground";
+import { isAdmin } from "../lib/admin";
+import logoi from "../assets/logoi.png";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 console.log(supabase);
 
@@ -16,10 +23,51 @@ export default function Home() {
   const methodRef = useRef<HTMLDivElement>(null);
   const [methodActive, setMethodActive] = useState(false);
 
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const cards = gsap.utils.toArray('.project-card') as HTMLElement[];
+    const section = document.getElementById('section-5');
+
+    if (!section || cards.length === 0) return;
+
+    // Stagger initial z-index so later cards sit on top
+    cards.forEach((card, i) => {
+      gsap.set(card, { y: '110%', zIndex: i + 1 });
+    });
+
+    // Add extra scroll distance so the last card stays on screen before unpinning
+    const extraReadTime = 1; 
+    const totalScroll = (cards.length + extraReadTime) * 100;
+
+    const st = ScrollTrigger.create({
+      trigger: section,
+      start: 'top top',
+      end: `+=${totalScroll}%`,
+      pin: section,     // pins the section while cards cycle through
+      scrub: 0.5,        // ties progress directly to scroll position
+      onUpdate: (self) => {
+        const progress = self.progress;
+        const perCard = 1 / (cards.length + extraReadTime);
+
+        cards.forEach((card, i) => {
+          const start = i * perCard;
+          const p = Math.max(0, Math.min(1, (progress - start) / perCard));
+          const yVal = (1 - p) * 130; // slides from 110% down to 0%
+          gsap.set(card, { y: `${yVal}%`, zIndex: i + 1 });
+        });
+      }
+    });
+
+    return () => {
+      st.kill();
+    };
+  }, []);
+
   const navigate = useNavigate();
 
   const [session, setSession] = useState<any>(null);
-  const [showProfile, setShowProfile] = useState(false);
+
 
   useEffect(() => {
     const getSession = async () => {
@@ -59,31 +107,25 @@ export default function Home() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setShowProfile(false);
     navigate("/");
   };
 
   return (
-    <div
-      className="min-h-screen text-foreground font-sans relative"
-      style={{
-        backgroundImage: "url('/bg.png')",
-        backgroundSize: "100% auto",
-        backgroundPosition: "center -150px",
-        backgroundAttachment: "fixed",
-      }}
-    >
+    <div className="min-h-screen text-foreground font-sans relative page-hero-bg">
       <div className="absolute inset-0 bg-black/60 z-0 pointer-events-none"></div>
 
       <div className="relative z-10">
         {/* Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 p-6 pt-8">
+        <nav className="absolute top-0 left-0 right-0 z-50 p-6 pt-8">
           <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 relative">
-            <div className="flex items-center space-x-1 z-10">
-              <div className="text-3xl font-serif text-white tracking-wide flex items-start">
-                T<span className="text-xl font-sans mt-0.5 ml-0.5">4</span>
-                Trader
-              </div>
+            <div className="flex items-center z-10 -ml-22 md:-ml-32">
+              <a href="#home" className="flex items-center">
+                <img 
+                  src={logoi}
+                  alt="T4 Trader" 
+                  className="h-16 md:h-20 lg:h-24 w-auto object-contain transform origin-left"
+                />
+              </a>
             </div>
 
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-16 bg-white/10 backdrop-blur-md border border-white/10 px-12 py-2.5 rounded-full shadow-lg z-10">
@@ -95,62 +137,68 @@ export default function Home() {
               </a>
               <Link
                 to="/course"
-                className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+                className="text-sm font-medium text-white/67 hover:text-white transition-colors"
               >
                 Course
               </Link>
+              {session && isAdmin(session.user?.email) && (
+                <Link
+                  to="/dashboard"
+                  className="text-sm font-medium text-white/67 hover:text-white transition-colors"
+                >
+                  Dashboard
+                </Link>
+              )}
               <a
                 href="#team"
-                className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+                className="text-sm font-medium text-white/67 hover:text-white transition-colors"
               >
                 Team
               </a>
               <a
                 href="#faq"
-                className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+                className="text-sm font-medium text-white/67 hover:text-white transition-colors"
               >
                 FAQS
               </a>
               <a
                 href="#footer"
-                className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+                className="text-sm font-medium text-white/67 hover:text-white transition-colors"
               >
                 About
               </a>
             </div>
             <div className="flex items-center space-x-2 md:space-x-4 z-10">
               {session ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowProfile(!showProfile)}
-                    className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center font-bold uppercase"
-                  >
-                    {session.user.email?.charAt(0)}
-                  </button>
-
-                  {showProfile && (
-                    <div className="absolute right-0 mt-3 w-52 rounded-xl bg-white p-3 text-black shadow-xl">
-                      <p className="text-sm border-b pb-2 truncate">
-                        {session.user.email}
-                      </p>
-
-                      <button
-                        onClick={handleLogout}
-                        className="mt-2 w-full rounded-lg px-3 py-2 text-left hover:bg-gray-100"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <UserProfile session={session} handleLogout={handleLogout} />
               ) : (
                 <Link
                   to="/login"
-                  className="text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 md:px-6 md:py-3 rounded-full text-white/80 hover:text-white transition-colors shadow-lg"
+                  className="hidden sm:inline-block text-xs md:text-sm font-medium bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 md:px-6 md:py-3 rounded-full text-white/80 hover:text-white transition-colors shadow-lg"
                 >
                   Register/Login
                 </Link>
               )}
+
+              <MobileMenu
+                links={[
+                  { label: "Home", to: "#home" },
+                  { label: "Course", to: "/course" },
+                  ...(session && isAdmin(session.user?.email) ? [{ label: "Dashboard", to: "/dashboard" }] : []),
+                  { label: "Team", to: "#team" },
+                  { label: "FAQs", to: "#faq" },
+                  { label: "About", to: "#footer" },
+                ]}
+              >
+                {!session && (
+                  <Link
+                    to="/login"
+                    className="sm:hidden text-center text-sm font-medium bg-white/5 border border-white/10 px-4 py-3 rounded-full text-white/80 hover:text-white transition-colors"
+                  >
+                    Register/Login
+                  </Link>
+                )}
+              </MobileMenu>
             </div>
           </div>
         </nav>
@@ -158,10 +206,13 @@ export default function Home() {
         {/* Hero Section */}
         <section
           id="home"
-          className="relative min-h-screen flex flex-col items-center justify-center pt-24 pb-32 overflow-hidden"
+          className="relative min-h-screen flex flex-col items-center justify-center pt-12 pb-8 md:pt-24 md:pb-32 overflow-hidden"
         >
-          <div className="relative z-10 text-center px-4 max-w-5xl mx-auto mt-16">
-            <h1 className="text-5xl sm:text-[4.5rem] md:text-[6.5rem] font-serif tracking-tight leading-[1.1] mb-6 md:mb-8">
+          {/* Interactive Halftone Background */}
+          <HalftoneBackground />
+          
+          <div className="relative z-10 text-center px-2 md:px-4 max-w-5xl mx-auto mt-16 pointer-events-none">
+            <h1 className="text-4xl sm:text-5xl md:text-[6.5rem] font-['Belgin'] tracking-tight leading-[1.1] mb-6 md:mb-8 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
               <StrobeText text="TRADE" className="text-accent" delay={0.2} />{" "}
               <StrobeText text="ON YOUR" className="text-white" delay={0.5} />
               <br />
@@ -172,34 +223,32 @@ export default function Home() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="mt-6 text-white max-w-xl mx-auto text-sm md:text-sm leading-relaxed font-sans font-light opacity-90"
+              transition={{ delay: 1.5, duration: 1 }}
+              className="text-gray-300 max-w-2xl mx-auto mb-8 md:mb-12 text-sm md:text-lg drop-shadow-md"
             >
               T4 traders teach a disciplined and four- part method -Timing,
-              <br className="hidden md:block" />
               Trend ,Trigger and Target. Read by 12000+ Students to read
-              <br className="hidden md:block" />
-              markets , manage risks and stop guessing.
+              markets , manage risks and stop guessing .
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-              className="mt-12 md:mt-16 flex flex-col sm:flex-row items-center justify-center gap-4 sm:space-x-4 space-x-0"
+              transition={{ delay: 2, duration: 0.8 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 pointer-events-auto"
             >
-              <Link to="/course" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-auto px-1.5 py-1.5 h-[52px] rounded-full bg-white text-black hover:bg-gray-100 flex items-center justify-between sm:justify-start pl-6 font-medium border-0 gap-3 group shadow-xl hover:shadow-2xl !transition-all">
+              <Link to="/course" className="w-full sm:w-auto flex justify-center">
+                <Button className="w-auto px-1.5 py-1.5 h-10 md:h-[52px] rounded-full bg-white text-black hover:bg-gray-100 flex items-center justify-between sm:justify-start pl-4 md:pl-6 text-sm md:text-base font-medium border-0 gap-2 md:gap-3 group shadow-xl hover:shadow-2xl !transition-all">
                   Start Learning
-                  <span className="w-[40px] h-[40px] rounded-full bg-[#83d483] flex items-center justify-center border-0 group-hover:bg-[#91df91] transition-colors shadow-none text-[#113816]">
-                    <ArrowRight className="w-5 h-5" />
+                  <span className="w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded-full bg-[#83d483] flex items-center justify-center border-0 group-hover:bg-[#91df91] transition-colors shadow-none text-[#113816]">
+                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
                   </span>
                 </Button>
               </Link>
-              <Link to="/free-trial" className="w-full sm:w-auto">
+              <Link to="/free-trial" className="w-full sm:w-auto flex justify-center">
                 <Button
                   variant="outline"
-                  className="w-full px-8 h-[52px] rounded-full border border-white text-white hover:bg-white/10 font-medium bg-black/20 backdrop-blur-sm"
+                  className="w-auto px-6 md:px-8 h-10 md:h-[52px] text-sm md:text-base rounded-full border border-white text-white hover:bg-white/10 font-medium bg-black/20 backdrop-blur-sm"
                 >
                   Free Trial
                 </Button>
@@ -210,12 +259,8 @@ export default function Home() {
           {/* Ticker Tape */}
           <div className="absolute bottom-10 left-0 right-0 z-10 overflow-hidden flex py-4 border-y border-white/5 bg-background/50 backdrop-blur-sm">
             <motion.div
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{
-                repeat: Infinity,
-                duration: 100,
-                ease: "linear",
-              }}
+              animate={{ x: [10, -500] }}
+              transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
               className="flex space-x-8 whitespace-nowrap text-sm tracking-widest font-mono"
             >
               {[
@@ -313,31 +358,23 @@ export default function Home() {
         {/* Word Marquee Section */}
         <section className="py-6 border-b border-white/5 overflow-hidden">
           <motion.div
-            animate={{ x: ["-20%", "0%"] }}
-            transition={{
-              repeat: Infinity,
-              duration: 40,
-              ease: "linear",
-            }}
-            className="flex whitespace-nowrap text-gray-500 font-mono font-bold uppercase tracking-widest text-sm"
+            animate={{ x: [-100, 1000] }}
+            transition={{ repeat: Infinity, duration: 70, ease: "linear", repeatType: "reverse" }}
+            className="flex space-x-12 whitespace-nowrap text-gray-500 font-mono font-bold uppercase tracking-widest text-sm"
           >
-            {[...Array(2)].map((_, i) => (
-              <div key={i} className="flex space-x-12 mr-12">
+            {[...Array(6)].map((_, i) => (
+              <span key={i} className="flex items-center space-x-12">
                 <span>SMC</span>
                 <span className="text-primary text-xs">✦</span>
-
                 <span>Price Action</span>
                 <span className="text-primary text-xs">✦</span>
-
                 <span>Psychology of Market</span>
                 <span className="text-primary text-xs">✦</span>
-
                 <span>Risk Management</span>
                 <span className="text-primary text-xs">✦</span>
-
                 <span>Advanced Concept (MSNR)</span>
                 <span className="text-primary text-xs">✦</span>
-              </div>
+              </span>
             ))}
           </motion.div>
         </section>
@@ -345,10 +382,10 @@ export default function Home() {
         {/* Stats Section */}
         <section
           id="stats"
-          className="py-16 relative bg-white/5 backdrop-blur-sm border-b border-white/5"
+          className="py-4 md:py-16 relative bg-white/5 backdrop-blur-sm border-b border-white/5"
         >
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 divide-x divide-white/10 text-center">
+          <div className="max-w-7xl mx-auto px-6 md:px-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8 divide-x divide-white/10 text-center">
               {[
                 { num: "12,400+", label: "Students trained" },
                 { num: "4.8/5", label: "Average course rating" },
@@ -370,12 +407,12 @@ export default function Home() {
 
         {/* Method Section */}
         <section
-          id="method"
+          id="section-5"
           ref={methodRef}
-          className="py-24 relative border-b border-white/5"
+          className="py-6 md:py-24 relative border-b border-white/5 bg-[#040d06] z-10"
         >
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="mb-16">
+          <div className="max-w-7xl mx-auto px-6 md:px-10">
+            <div className="mb-6 md:mb-16">
               <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
                 The framework
               </span>
@@ -390,7 +427,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div id="projectsContainer" className="projects-stack-container">
               {[
                 {
                   num: "T1",
@@ -417,44 +454,46 @@ export default function Home() {
                   desc: "Position sizing, scaling out, and portfolio-level targets — the discipline layer that turns single winning trades into a compounding, repeatable process.",
                 },
               ].map((method, i) => (
-                <GlitchHoverCard
-                  key={i}
-                  active={methodActive}
-                  className="sticky grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 md:gap-8 items-center py-8 md:py-12 px-4 md:px-6 rounded-2xl text-center md:text-left bg-black/80 backdrop-blur-md shadow-[0_-10px_25px_rgba(0,0,0,0.1)] border border-white/10 group"
-                  style={{
-                    top: `calc(100px + ${i * 40}px)`,
-                    zIndex: i + 10,
-                  }}
-                >
-                  <div
-                    className="text-[4rem] md:text-[7rem] font-serif font-bold text-transparent transition-all duration-500"
-                    style={{
-                      WebkitTextStroke: methodActive
-                        ? "0"
-                        : "1px rgba(255,255,255,0.2)",
-                    }}
+                <div key={i} className="project-card">
+                  <GlitchHoverCard
+                    active={methodActive}
+                    className="h-full w-full flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12 py-8 md:py-12 px-8 md:px-12 rounded-3xl text-left bg-[#0a110a]/90 backdrop-blur-xl border border-white/10 group relative overflow-hidden"
                   >
-                    <span
-                      className={`transition-colors duration-500 ${
-                        methodActive ? "text-primary" : "text-transparent"
-                      }`}
+                    {/* Background glow effect on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                    <div
+                      className="text-[5rem] md:text-[8rem] font-serif font-bold leading-none text-transparent transition-all duration-500 shrink-0"
+                      style={{
+                        WebkitTextStroke: methodActive
+                          ? "0"
+                          : "1px rgba(255,255,255,0.2)",
+                      }}
                     >
-                      {method.num}
-                    </span>
-                  </div>
+                      <span
+                        className={`transition-colors duration-500 ${
+                          methodActive ? "text-primary" : "text-transparent"
+                        }`}
+                      >
+                        {method.num}
+                      </span>
+                    </div>
 
-                  <div>
-                    <span className="text-primary font-mono text-xs tracking-widest uppercase mb-3 block">
-                      {method.tag}
-                    </span>
+                    <div className="relative z-10 flex-1">
+                      <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-full font-mono text-xs tracking-widest uppercase mb-5">
+                        {method.tag}
+                      </span>
 
-                    <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                      {method.title}
-                    </h3>
+                      <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-white leading-tight">
+                        {method.title}
+                      </h3>
 
-                    <p className="text-gray-400 max-w-xl">{method.desc}</p>
-                  </div>
-                </GlitchHoverCard>
+                      <p className="text-gray-400 text-base md:text-lg max-w-2xl leading-relaxed">
+                        {method.desc}
+                      </p>
+                    </div>
+                  </GlitchHoverCard>
+                </div>
               ))}
             </div>
           </div>
@@ -463,10 +502,10 @@ export default function Home() {
         {/* features section Section */}
         <section
           id="features"
-          className="py-24 relative overflow-hidden bg-black/40 border-y border-white/5 backdrop-blur-sm"
+          className="py-6 md:py-24 relative overflow-hidden bg-black/40 border-y border-white/5 backdrop-blur-sm"
         >
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-16 items-center">
+          <div className="max-w-7xl mx-auto px-4 md:px-8">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -488,7 +527,7 @@ export default function Home() {
 
                 <div className="space-y-8 relative pl-8 border-l border-white/10">
                   <div className="relative">
-                    <div className="absolute -left-[41px] top-1 w-4 h-8 bg-primary rounded-sm shadow-[0_0_10px_rgba(50,205,50,0.5)]"></div>
+                    <div className="absolute -left-[38px] top-1.5 w-3 h-6 bg-primary rounded-sm shadow-[0_0_10px_rgba(50,205,50,0.5)]"></div>
                     <h3 className="text-2xl font-bold mb-2">Our Mission</h3>
                     <p className="text-gray-400">
                       To empower aspiring traders with practical knowledge and
@@ -496,7 +535,7 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="relative mt-8">
-                    <div className="absolute -left-[41px] top-1 w-4 h-8 bg-red-600 rounded-sm shadow-[0_0_10px_rgba(220,38,38,0.5)]"></div>
+                    <div className="absolute -left-[38px] top-1.5 w-3 h-6 bg-red-600 rounded-sm shadow-[0_0_10px_rgba(220,38,38,0.5)]"></div>
                     <h3 className="text-2xl font-bold mb-2">Our Vision</h3>
                     <p className="text-gray-400">
                       To become one of the most trusted trading education
@@ -512,7 +551,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="relative rounded-2xl overflow-hidden border border-white/10 aspect-video md:aspect-auto md:h-full"
+                className="relative rounded-2xl overflow-hidden border border-white/10 w-full aspect-[21/9] md:aspect-auto md:h-full"
               >
                 <img
                   src="/about_trading.png"
@@ -527,10 +566,10 @@ export default function Home() {
         {/* Gallery Section */}
         <section
           id="gallery"
-          className="py-24 relative overflow-hidden bg-black/2 border-b border-white/5 backdrop-blur-sm"
+          className="py-6 md:py-24 relative overflow-hidden bg-black/2 border-b border-white/5 backdrop-blur-sm"
         >
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="mb-16">
+          <div className="max-w-7xl mx-auto px-4 md:px-8">
+            <div className="mb-6 md:mb-16">
               <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
                 Inside T4
               </span>
@@ -549,30 +588,30 @@ export default function Home() {
                   title: "Live chart walkthroughs",
                   img: "/chart_walkthroughs.png",
                   span: "lg:col-span-2",
-                  aspect: "aspect-[21/9]",
+                  aspect: "aspect-[16/10] md:aspect-[21/9]",
                 },
                 {
                   title: "Dashboard & screener setup",
                   img: "/dashboard_screener.png",
                   span: "lg:col-span-2",
-                  aspect: "aspect-[21/9]",
+                  aspect: "aspect-[16/10] md:aspect-[21/9]",
                 },
                 {
                   title: "Momentum & signal drills",
                   img: "/dashboard_screener.png",
                   span: "lg:col-span-2",
-                  aspect: "aspect-[21/9]",
+                  aspect: "aspect-[16/10] md:aspect-[21/9]",
                 },
                 {
                   title: "Paired trade review",
                   img: "/paired_review.png",
                   span: "lg:col-span-2",
-                  aspect: "aspect-[21/9]",
+                  aspect: "aspect-[16/10] md:aspect-[21/9]",
                 },
               ].map((item, i) => (
                 <div
                   key={i}
-                  className={`relative rounded-2xl overflow-hidden group border border-white/10 ${item.span} ${item.aspect}`}
+                  className={`relative rounded-2xl overflow-hidden group border border-white/10 w-full aspect-[21/9] md:aspect-[21/9] ${item.span}`}
                 >
                   <img
                     src={item.img}
@@ -592,9 +631,9 @@ export default function Home() {
         {/* Review Section */}
         <section
           id="review"
-          className="py-24 relative overflow-hidden border-b border-white/5"
+          className="py-6 md:py-24 relative overflow-hidden border-b border-white/5"
         >
-          <div className="max-w-7xl mx-auto px-4 mb-16">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 mb-6 md:mb-16">
             <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
               Student Review
             </span>
@@ -653,7 +692,7 @@ export default function Home() {
               <motion.div
                 key={i}
                 animate={{ x: i % 2 === 0 ? [0, -1000] : [-1000, 0] }}
-                transition={{ repeat: Infinity, duration: 40, ease: "linear" }}
+                transition={{ repeat: Infinity, duration: 40, ease: "linear", repeatType: "reverse" }}
                 className="flex gap-6 w-max"
               >
                 {[...row, ...row].map((t, j) => (
@@ -676,18 +715,21 @@ export default function Home() {
         </section>
 
         {/* Team Section */}
-        <section id="team" className="py-24 relative" >
-          <div className="max-w-7xl mx-auto px-4 overflow-hidden">
-            <h2 className="text-3xl font-bold mb-12 text-center">
+        <section id="team" className="py-6 md:py-24 relative">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 overflow-hidden">
+            <h2 className="text-3xl font-bold mb-6 md:mb-6 md:mb-12 text-center">
               Meet Our <span className="text-primary">Team</span>
             </h2>
 
             <h3 className="text-xl font-semibold mb-6 text-gray-400 border-b border-white/10 pb-2">
               Teaching Mentors
             </h3>
-            <div className="grid md:grid-cols-2 gap-8 mb-16">
+            <div className="grid md:grid-cols-2 gap-8 mb-6 md:mb-16">
               {[1, 2].map((i) => (
-                <GlassCard key={i} className="flex items-center space-x-6">
+                <GlassCard
+                  key={i}
+                  className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left"
+                >
                   <div className="w-24 h-24 rounded-full bg-white/10 flex-shrink-0 border-2 border-primary/50 overflow-hidden">
                     <img
                       src={`https://i.pravatar.cc/150?img=${i + 10}`}
@@ -712,9 +754,9 @@ export default function Home() {
         </section>
 
         {/* FAQ Section */}
-        <section id="faq" className="py-24 relative border-t border-white/10">
-          <div className="max-w-3xl mx-auto px-4">
-            <div className="text-center mb-16">
+        <section id="faq" className="py-6 md:py-24 relative border-t border-white/10">
+          <div className="max-w-3xl mx-auto px-4 md:px-8">
+            <div className="text-center mb-6 md:mb-16">
               <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
                 Questions
               </span>
@@ -781,9 +823,9 @@ export default function Home() {
         {/* Footer / Contact */}
         <footer
           id="footer"
-          className="bg-[#020703] border-t border-white/10 pt-16 pb-8"
+          className="bg-[#020703] border-t border-white/10 pt-10 md:pt-16 pb-6 md:pb-8"
         >
-          <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-12 mb-12">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 grid md:grid-cols-4 gap-8 md:gap-12 mb-4 md:mb-6 md:mb-12">
             <div>
               <div className="text-2xl font-bold tracking-tighter mb-6">
                 <span className="text-white">T4</span>

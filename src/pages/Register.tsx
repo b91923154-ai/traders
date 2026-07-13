@@ -57,16 +57,9 @@ export default function Register() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-background flex flex-col items-center justify-center relative overflow-hidden"
-      style={{
-        backgroundImage: "url('/bg.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center relative overflow-hidden px-4 py-12 page-cover-bg">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-0"></div>
-      <div className="relative z-10 w-full max-w-md p-8 rounded-2xl bg-[#0a180f]/80 border border-primary/20 shadow-[0_0_30px_rgba(50,205,50,0.1)]">
+      <div className="relative z-10 w-full max-w-md p-6 sm:p-8 rounded-2xl bg-[#0a180f]/80 border border-primary/20 shadow-[0_0_30px_rgba(50,205,50,0.1)]">
         <h2 className="text-3xl font-bold text-center mb-6">
           Create <span className="text-primary">Account</span>
         </h2>
