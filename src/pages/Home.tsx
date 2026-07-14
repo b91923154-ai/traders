@@ -32,12 +32,13 @@ export default function Home() {
 
     // Stagger initial z-index so later cards sit on top
     cards.forEach((card, i) => {
-      gsap.set(card, { y: '110%', zIndex: i + 1 });
+      gsap.set(card, { y: i === 0 ? '0%' : '110%', zIndex: i + 1 });
     });
 
     // Add extra scroll distance so the last card stays on screen before unpinning
     const extraReadTime = 1; 
-    const totalScroll = (cards.length + extraReadTime) * 100;
+    const numAnimatedCards = cards.length - 1;
+    const totalScroll = (numAnimatedCards + extraReadTime) * 100;
 
     const st = ScrollTrigger.create({
       trigger: section,
@@ -47,13 +48,17 @@ export default function Home() {
       scrub: 0.5,        // ties progress directly to scroll position
       onUpdate: (self) => {
         const progress = self.progress;
-        const perCard = 1 / (cards.length + extraReadTime);
+        const perCard = 1 / (numAnimatedCards + extraReadTime);
 
         cards.forEach((card, i) => {
-          const start = i * perCard;
-          const p = Math.max(0, Math.min(1, (progress - start) / perCard));
-          const yVal = (1 - p) * 130; // slides from 110% down to 0%
-          gsap.set(card, { y: `${yVal}%`, zIndex: i + 1 });
+          if (i === 0) {
+            gsap.set(card, { y: '0%', zIndex: 1 });
+          } else {
+            const start = (i - 1) * perCard;
+            const p = Math.max(0, Math.min(1, (progress - start) / perCard));
+            const yVal = (1 - p) * 130; // slides from 130% down to 0%
+            gsap.set(card, { y: `${yVal}%`, zIndex: i + 1 });
+          }
         });
       }
     });
@@ -447,7 +452,7 @@ export default function Home() {
                 <div key={i} className="project-card">
                   <GlitchHoverCard
                     active={methodActive}
-                    className="h-full w-full flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12 py-8 md:py-12 px-8 md:px-12 rounded-3xl text-left bg-[#0a110a]/90 backdrop-blur-xl border border-white/10 group relative overflow-hidden"
+                    className="h-full w-full flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12 py-8 md:py-12 px-8 md:px-12 rounded-3xl text-left bg-[#0a110a]/90 backdrop-blur-xl border border-white/10 group relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_rgba(201,255,0,0.25)] hover:border-[#c9ff00]/50"
                   >
                     {/* Background glow effect on hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
