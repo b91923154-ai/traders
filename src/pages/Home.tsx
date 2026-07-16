@@ -25,47 +25,7 @@ export default function Home() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    const cards = gsap.utils.toArray(".project-card") as HTMLElement[];
-    const section = document.getElementById("section-5");
-
-    if (!section || cards.length === 0) return;
-
-    // Stagger initial z-index so later cards sit on top
-    cards.forEach((card, i) => {
-      gsap.set(card, { y: i === 0 ? "0%" : "110%", zIndex: i + 1 });
-    });
-
-    // Add extra scroll distance so the last card stays on screen before unpinning
-    const extraReadTime = 1;
-    const numAnimatedCards = cards.length - 1;
-    const totalScroll = (numAnimatedCards + extraReadTime) * 100;
-
-    const st = ScrollTrigger.create({
-      trigger: section,
-      start: "top top",
-      end: `+=${totalScroll}%`,
-      pin: section, // pins the section while cards cycle through
-      scrub: 0.5, // ties progress directly to scroll position
-      onUpdate: (self) => {
-        const progress = self.progress;
-        const perCard = 1 / (numAnimatedCards + extraReadTime);
-
-        cards.forEach((card, i) => {
-          if (i === 0) {
-            gsap.set(card, { y: "0%", zIndex: 1 });
-          } else {
-            const start = (i - 1) * perCard;
-            const p = Math.max(0, Math.min(1, (progress - start) / perCard));
-            const yVal = (1 - p) * 130; // slides from 130% down to 0%
-            gsap.set(card, { y: `${yVal}%`, zIndex: i + 1 });
-          }
-        });
-      },
-    });
-
-    return () => {
-      st.kill();
-    };
+// Removed GSAP pin for Four Pillars - replaced with native CSS sticky
   }, []);
 
   const navigate = useNavigate();
@@ -206,7 +166,7 @@ export default function Home() {
           id="home"
           className="relative min-h-screen flex flex-col items-center justify-center pt-12 pb-8 md:pt-24 md:pb-32 overflow-hidden"
         >
-          <div className="relative z-10 text-center px-2 md:px-4 max-w-5xl mx-auto mt-16 pointer-events-none">
+          <div className="relative z-10 text-center px-6 md:px-8 max-w-5xl mx-auto mt-16 pointer-events-none">
             <h1 className="text-4xl sm:text-5xl md:text-[6.5rem] font-['Belgin'] tracking-tight leading-[1.1] mb-6 md:mb-8 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
               <StrobeText text="TRADE" className="text-accent" delay={0.2} />{" "}
               <StrobeText text="ON YOUR" className="text-white" delay={0.5} />
@@ -236,10 +196,10 @@ export default function Home() {
                 to="/course"
                 className="w-full sm:w-auto flex justify-center"
               >
-                <Button className="w-auto px-1.5 py-1.5 h-10 md:h-[52px] rounded-full bg-white text-black hover:bg-gray-100 flex items-center justify-between sm:justify-start pl-4 md:pl-6 text-sm md:text-base font-medium border-0 gap-2 md:gap-3 group shadow-xl hover:shadow-2xl !transition-all">
+                <Button className="w-auto px-1.5 py-1.5 h-9 md:h-[52px] rounded-full bg-white text-black hover:bg-gray-100 flex items-center justify-between sm:justify-start pl-3 md:pl-6 text-xs md:text-base font-medium border-0 gap-2 md:gap-3 group shadow-xl hover:shadow-2xl !transition-all">
                   Start Learning
-                  <span className="w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded-full bg-[#83d483] flex items-center justify-center border-0 group-hover:bg-[#91df91] transition-colors shadow-none text-[#113816]">
-                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="w-[24px] h-[24px] md:w-[40px] md:h-[40px] rounded-full bg-[#83d483] flex items-center justify-center border-0 group-hover:bg-[#91df91] transition-colors shadow-none text-[#113816]">
+                    <ArrowRight className="w-3 h-3 md:w-5 md:h-5" />
                   </span>
                 </Button>
               </Link>
@@ -249,7 +209,7 @@ export default function Home() {
               >
                 <Button
                   variant="outline"
-                  className="w-auto px-6 md:px-8 h-10 md:h-[52px] text-sm md:text-base rounded-full border border-white text-white hover:bg-white/10 font-medium bg-black/20 backdrop-blur-sm"
+                  className="w-auto px-4 md:px-8 h-9 md:h-[52px] text-xs md:text-base rounded-full border border-white text-white hover:bg-white/10 font-medium bg-black/20 backdrop-blur-sm"
                 >
                   Free Trial
                 </Button>
@@ -410,7 +370,7 @@ export default function Home() {
         <section
           id="section-5"
           ref={methodRef}
-          className="py-6 md:py-24 relative border-b border-white/5 bg-[#040d06] z-10"
+          className="py-4 md:py-24 relative border-b border-white/5 bg-[#040d06] z-10"
         >
           <div className="max-w-7xl mx-auto px-6 md:px-10">
             <div className="mb-6 md:mb-16">
@@ -455,7 +415,7 @@ export default function Home() {
                   desc: "Position sizing, scaling out, and portfolio-level targets — the discipline layer that turns single winning trades into a compounding, repeatable process.",
                 },
               ].map((method, i) => (
-                <div key={i} className="project-card">
+                <div key={i} className="project-card sticky top-24 md:top-32" style={{ zIndex: i }}>
                   <GlitchHoverCard
                     active={methodActive}
                     className="h-full w-full flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12 py-8 md:py-12 px-8 md:px-12 rounded-3xl text-left bg-[#0a110a]/90 backdrop-blur-xl border border-white/10 group relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_rgba(201,255,0,0.25)] hover:border-[#c9ff00]/50"
@@ -503,9 +463,9 @@ export default function Home() {
         {/* features section Section */}
         <section
           id="features"
-          className="py-6 md:py-24 relative overflow-hidden bg-black/40 border-y border-white/5 backdrop-blur-sm"
+          className="py-4 md:py-24 relative overflow-hidden bg-black/40 border-y border-white/5 backdrop-blur-sm"
         >
-          <div className="max-w-7xl mx-auto p-7 md:px-10">
+          <div className="max-w-7xl mx-auto px-6 md:px-10 py-2">
             <div className="grid md:grid-cols-2 gap-4 md:gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
@@ -552,7 +512,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="relative rounded-2xl overflow-hidden border border-white/10 w-full aspect-[21/9] md:aspect-auto md:h-full"
+                className="relative rounded-2xl overflow-hidden border border-white/10 w-full h-48 md:aspect-auto md:h-full"
               >
                 <img
                   src="/about_trading.png"
@@ -567,9 +527,9 @@ export default function Home() {
         {/* Gallery Section */}
         <section
           id="gallery"
-          className="py-6 md:py-24 relative overflow-hidden bg-black/2 border-b border-white/5 backdrop-blur-sm"
+          className="py-4 md:py-24 relative overflow-hidden bg-black/2 border-b border-white/5 backdrop-blur-sm"
         >
-          <div className="max-w-7xl mx-auto p-7 md:px-10">
+          <div className="max-w-7xl mx-auto px-6 md:px-10 py-2">
             <div className="mb-6 md:mb-16">
               <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
                 Inside T4
@@ -632,9 +592,9 @@ export default function Home() {
         {/* Review Section */}
         <section
           id="review"
-          className="py-6 md:py-24 relative overflow-hidden border-b border-white/5"
+          className="py-4 md:py-24 relative overflow-hidden border-b border-white/5"
         >
-          <div className="max-w-7xl mx-auto p-7 md:px-10 mb-6 md:mb-16">
+          <div className="max-w-7xl mx-auto px-6 md:px-10 py-2 mb-4 md:mb-16">
             <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
               Student Review
             </span>
@@ -720,89 +680,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Team Section */}
-        <section
-          id="team"
-          className="py-16 md:py-32 relative overflow-hidden bg-black"
-        >
-          <div className="max-w-4xl mx-auto px-6 md:px-10 relative z-10">
-            <div className="text-center mb-16">
-              <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
-                The Experts Behind T4
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-                Meet Our <span className="text-primary">Mentors</span>
-              </h2>
-            </div>
 
-            {/* Split Screen Accordion Container */}
-            <div className="group flex flex-col md:flex-row w-full h-[600px] md:h-[450px] rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-[#0a0a0a]">
-              {/* Member 1 (Left / Top) */}
-              <div className="group/member w-full h-1/2 md:w-1/2 md:h-full group-hover:h-0 md:group-hover:h-full md:group-hover:w-0 hover:!h-full md:hover:!w-full transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] relative overflow-hidden cursor-pointer border-b md:border-b-0 md:border-r border-white/10">
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
-                <img
-                  src="https://i.pravatar.cc/800?img=11"
-                  alt="Rahul Sharma"
-                  className="absolute inset-0 w-full h-full object-cover object-top opacity-70 group-hover/member:opacity-100 group-hover/member:scale-105 transition-all duration-700"
-                />
-                <div className="absolute inset-0 z-20 p-8 md:p-12 flex flex-col justify-end">
-                  <div className="transform md:translate-y-16 group-hover/member:translate-y-0 transition-transform duration-700">
-                    <h3 className="text-3xl md:text-4xl font-bold text-white mb-2 whitespace-nowrap">
-                      Rahul Sharma
-                    </h3>
-                    <p className="text-primary font-mono text-sm tracking-wider uppercase mb-6 whitespace-nowrap">
-                      Senior Price Action Expert
-                    </p>
-
-                    <div className="opacity-0 group-hover/member:opacity-100 transition-opacity duration-700 md:delay-100 max-w-md h-0 group-hover/member:h-auto overflow-hidden">
-                      <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-6">
-                        Master of pure price action. Rahul simplifies complex
-                        market structures into highly actionable, rules-based
-                        strategies. He has been helping students since 2018 with
-                        a focus on risk management.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Member 2 (Right / Bottom) */}
-              <div className="group/member w-full h-1/2 md:w-1/2 md:h-full group-hover:h-0 md:group-hover:h-full md:group-hover:w-0 hover:!h-full md:hover:!w-full transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] relative overflow-hidden cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10" />
-                <img
-                  src="https://i.pravatar.cc/800?img=12"
-                  alt="Ananya Desai"
-                  className="absolute inset-0 w-full h-full object-cover object-top opacity-70 group-hover/member:opacity-100 group-hover/member:scale-105 transition-all duration-700"
-                />
-                <div className="absolute inset-0 z-20 p-8 md:p-12 flex flex-col justify-end">
-                  <div className="transform md:translate-y-16 group-hover/member:translate-y-0 transition-transform duration-700">
-                    <h3 className="text-3xl md:text-4xl font-bold text-white mb-2 whitespace-nowrap">
-                      Ananya Desai
-                    </h3>
-                    <p className="text-primary font-mono text-sm tracking-wider uppercase mb-6 whitespace-nowrap">
-                      Options & Derivatives
-                    </p>
-
-                    <div className="opacity-0 group-hover/member:opacity-100 transition-opacity duration-700 md:delay-100 max-w-md h-0 group-hover/member:h-auto overflow-hidden">
-                      <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-6">
-                        Specializes in delta-neutral and directional options
-                        strategies. She helps students manage risk while
-                        maximizing leverage using systematic trading algorithms.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* FAQ Section */}
         <section
           id="faq"
-          className="py-6 md:py-24 relative border-t border-white/10"
+          className="py-4 md:py-24 relative border-t border-white/10"
         >
-          <div className="max-w-3xl mx-auto p-7 md:px-10">
+          <div className="max-w-3xl mx-auto px-6 md:px-10 py-2">
             <div className="text-center mb-6 md:mb-16">
               <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
                 Questions
@@ -870,9 +755,9 @@ export default function Home() {
         {/* Footer / Contact */}
         <footer
           id="footer"
-          className="bg-[#020703] border-t border-white/10 pt-10 md:pt-16 pb-6 md:pb-8"
+          className="bg-[#020703] border-t border-white/10 pt-8 md:pt-16 pb-6 md:pb-8"
         >
-          <div className="max-w-7xl mx-auto p-7 md:px-10 grid md:grid-cols-4 gap-8 md:gap-12 mb-4 md:mb-6 md:mb-12">
+          <div className="max-w-7xl mx-auto px-6 md:px-10 grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-12 mb-4 md:mb-12">
             <div>
               <div className="text-2xl font-bold tracking-tighter mb-6">
                 <span className="text-white">T4</span>
