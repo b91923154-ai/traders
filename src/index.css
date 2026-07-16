@@ -148,18 +148,29 @@ body {
 }
 
 .projects-stack-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  position: relative;
+  height: 340px;
+  margin: 0 auto 120px;
+  width: 100%;
 }
 
 .project-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   border-radius: 20px;
+  height: 340px;
+  transform: translateY(100%); /* starting position — off-screen below */
   will-change: transform;
 }
 
 @media (max-width: 768px) {
+  .projects-stack-container {
+    height: 480px;
+  }
+  
   .project-card {
-    min-height: 480px;
+    height: 480px;
   }
 }
