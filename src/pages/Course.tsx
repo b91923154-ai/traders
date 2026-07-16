@@ -3,15 +3,11 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { GlassCard } from '../components/ui/GlassCard';
 import { CheckCircle2, ArrowRight, Mail, MapPin, Phone } from 'lucide-react';
-import { MobileMenu } from '../components/MobileMenu';
 import { Navbar } from '../components/Navbar';
 import { courses } from '../data/courses';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { UserProfile } from '../components/ui/UserProfile';
-import { isAdmin } from '../lib/admin';
-import logoi from '../assets/logoi.png';
 
 export default function Course() {
   const navigate = useNavigate();

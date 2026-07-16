@@ -1,14 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
-import { UserProfile } from "../components/ui/UserProfile";
-import { MobileMenu } from "../components/MobileMenu";
 import { Navbar } from "../components/Navbar";
 import { GlassCard } from "../components/ui/GlassCard";
-import logoi from "../assets/logoi.png";
 import { Users, DollarSign, Activity, FileText } from "lucide-react";
-import { isAdmin } from "../lib/admin";
 
 interface Transaction {
   id: string;

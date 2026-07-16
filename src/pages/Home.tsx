@@ -5,15 +5,11 @@ import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
 import { StrobeText } from "../components/StrobeText";
 import { GlitchHoverCard } from "../components/GlitchHoverCard";
 import { MagneticIcon } from "../components/MagneticIcon";
-import { MobileMenu } from "../components/MobileMenu";
 import { Navbar } from "../components/Navbar";
 
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import { UserProfile } from "../components/ui/UserProfile";
-import { isAdmin } from "../lib/admin";
-import logoi from "../assets/logoi.png";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
