@@ -115,9 +115,10 @@ export default function Home() {
 
       <div className="relative z-10">
         {/* Navigation */}
-        <nav className="absolute top-0 left-0 right-0 z-50 p-6 pt-8">
+        <nav className="absolute top-0 left-0 right-0 z-50 p-6 pt-8"> 
           <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 relative">
-            <div className="flex items-center z-10 -ml-22 md:-ml-32">
+            
+            <div className="flex items-center gap-3 mb-8">
               <a href="#home" className="flex items-center">
                 <img 
                   src={logoi}
@@ -397,12 +398,12 @@ export default function Home() {
 
         {/* Method Section */}
         <section
-          id="section-5"
+          id="method"
           ref={methodRef}
-          className="py-6 md:py-24 relative border-b border-white/5 bg-[#040d06] z-10"
+          className="py-24 relative border-b border-white/5"
         >
-          <div className="max-w-7xl mx-auto px-6 md:px-10">
-            <div className="mb-6 md:mb-16">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="mb-16">
               <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
                 The framework
               </span>
@@ -417,7 +418,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div id="projectsContainer" className="projects-stack-container">
+            <div className="space-y-6">
               {[
                 {
                   num: "T1",
@@ -444,46 +445,44 @@ export default function Home() {
                   desc: "Position sizing, scaling out, and portfolio-level targets — the discipline layer that turns single winning trades into a compounding, repeatable process.",
                 },
               ].map((method, i) => (
-                <div key={i} className="project-card">
-                  <GlitchHoverCard
-                    active={methodActive}
-                    className="h-full w-full flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12 py-8 md:py-12 px-8 md:px-12 rounded-3xl text-left bg-[#0a110a]/90 backdrop-blur-xl border border-white/10 group relative overflow-hidden"
+                <GlitchHoverCard
+                  key={i}
+                  active={methodActive}
+                  className="sticky grid grid-cols-1 md:grid-cols-[200px_1fr] gap-4 md:gap-8 items-center py-8 md:py-12 px-4 md:px-6 rounded-2xl text-center md:text-left bg-black/80 backdrop-blur-md shadow-[0_-10px_25px_rgba(0,0,0,0.1)] border border-white/10 group"
+                  style={{
+                    top: `calc(100px + ${i * 40}px)`,
+                    zIndex: i + 10,
+                  }}
+                >
+                  <div
+                    className="text-[4rem] md:text-[7rem] font-serif font-bold text-transparent transition-all duration-500"
+                    style={{
+                      WebkitTextStroke: methodActive
+                        ? "0"
+                        : "1px rgba(255,255,255,0.2)",
+                    }}
                   >
-                    {/* Background glow effect on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                    <div
-                      className="text-[5rem] md:text-[8rem] font-serif font-bold leading-none text-transparent transition-all duration-500 shrink-0"
-                      style={{
-                        WebkitTextStroke: methodActive
-                          ? "0"
-                          : "1px rgba(255,255,255,0.2)",
-                      }}
+                    <span
+                      className={`transition-colors duration-500 ${
+                        methodActive ? "text-primary" : "text-transparent"
+                      }`}
                     >
-                      <span
-                        className={`transition-colors duration-500 ${
-                          methodActive ? "text-primary" : "text-transparent"
-                        }`}
-                      >
-                        {method.num}
-                      </span>
-                    </div>
+                      {method.num}
+                    </span>
+                  </div>
 
-                    <div className="relative z-10 flex-1">
-                      <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-full font-mono text-xs tracking-widest uppercase mb-5">
-                        {method.tag}
-                      </span>
+                  <div>
+                    <span className="text-primary font-mono text-xs tracking-widest uppercase mb-3 block">
+                      {method.tag}
+                    </span>
 
-                      <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-white leading-tight">
-                        {method.title}
-                      </h3>
+                    <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                      {method.title}
+                    </h3>
 
-                      <p className="text-gray-400 text-base md:text-lg max-w-2xl leading-relaxed">
-                        {method.desc}
-                      </p>
-                    </div>
-                  </GlitchHoverCard>
-                </div>
+                    <p className="text-gray-400 max-w-xl">{method.desc}</p>
+                  </div>
+                </GlitchHoverCard>
               ))}
             </div>
           </div>
