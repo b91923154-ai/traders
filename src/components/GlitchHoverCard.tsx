@@ -15,25 +15,29 @@ export function GlitchHoverCard({
 }: GlitchHoverCardProps) {
   return (
     <motion.div
-      initial={{
-        y: "-30%",
-      }}
       animate={{
-        y: active ? 0 : "0%",
+        backgroundColor: active ? "rgba(201,255,0,0.05)" : "rgba(10,17,10,0.9)",
+        borderColor: active ? "rgba(201,255,0,0.5)" : "rgba(255,255,255,0.1)",
+        boxShadow: active
+          ? "0 0 40px rgba(201,255,0,.25)"
+          : "0 0 0 rgba(0,0,0,0)",
       }}
       transition={{
-        duration: 0.6,
-        ease: "easeInOut",
+        duration: 0.35,
       }}
-      className={`relative overflow-hidden transition-colors duration-300 ${className} ${
-        active ? "bg-primary/5" : ""
-      }`}
+      className={`relative overflow-hidden ${className}`}
       style={style}
     >
-      <div
-        className="absolute left-0 top-0 w-1 bg-primary transition-all duration-300"
+      <motion.div
+        className="absolute left-0 top-0 bottom-0 w-[4px] bg-primary"
+        animate={{
+          scaleY: active ? 1 : 0,
+        }}
         style={{
-          height: active ? "100%" : "0%",
+          transformOrigin: "top",
+        }}
+        transition={{
+          duration: 0.3,
         }}
       />
 

@@ -3,68 +3,18 @@ import { Button } from "../components/ui/Button";
 import { GlassCard } from "../components/ui/GlassCard";
 import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
 import { StrobeText } from "../components/StrobeText";
-import { GlitchHoverCard } from "../components/GlitchHoverCard";
 import { MagneticIcon } from "../components/MagneticIcon";
 import { Navbar } from "../components/Navbar";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-console.log(supabase);
+import { UserProfile } from "../components/ui/UserProfile";
+import { isAdmin } from "../lib/admin";
+import logoi from "../assets/logoi.png";
+import FrameworkSection from "../components/FrameworkSection";
 
 export default function Home() {
-  const methodRef = useRef<HTMLDivElement>(null);
-  const [methodActive, setMethodActive] = useState(false);
-
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const cards = gsap.utils.toArray(".project-card") as HTMLElement[];
-    const section = document.getElementById("section-5");
-
-    if (!section || cards.length === 0) return;
-
-    // Stagger initial z-index so later cards sit on top
-    cards.forEach((card, i) => {
-      gsap.set(card, { y: i === 0 ? "0%" : "110%", zIndex: i + 1 });
-    });
-
-    // Add extra scroll distance so the last card stays on screen before unpinning
-    const extraReadTime = 1;
-    const numAnimatedCards = cards.length - 1;
-    const totalScroll = (numAnimatedCards + extraReadTime) * 100;
-
-    const st = ScrollTrigger.create({
-      trigger: section,
-      start: "top top",
-      end: `+=${totalScroll}%`,
-      pin: section, // pins the section while cards cycle through
-      scrub: 0.5, // ties progress directly to scroll position
-      onUpdate: (self) => {
-        const progress = self.progress;
-        const perCard = 1 / (numAnimatedCards + extraReadTime);
-
-        cards.forEach((card, i) => {
-          if (i === 0) {
-            gsap.set(card, { y: "0%", zIndex: 1 });
-          } else {
-            const start = (i - 1) * perCard;
-            const p = Math.max(0, Math.min(1, (progress - start) / perCard));
-            const yVal = (1 - p) * 130; // slides from 130% down to 0%
-            gsap.set(card, { y: `${yVal}%`, zIndex: i + 1 });
-          }
-        });
-      },
-    });
-
-    return () => {
-      st.kill();
-    };
-  }, []);
-
   const navigate = useNavigate();
 
   const [session, setSession] = useState<any>(null);
@@ -88,23 +38,6 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setMethodActive(entry.isIntersecting);
-      },
-      {
-        threshold: 0.4,
-      },
-    );
-
-    if (methodRef.current) {
-      observer.observe(methodRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/");
@@ -115,15 +48,83 @@ export default function Home() {
       <div className="absolute inset-0 bg-black/60 z-0 pointer-events-none"></div>
 
       <div className="relative z-10">
-        <Navbar session={session} handleLogout={handleLogout} isHome={true} />
+        {/* Navigation */}
+        <nav className="absolute top-0 left-0 right-0 z-50">
+          <div className="max-w-[1800px] mx-auto px-8 xl:px-20 flex items-center justify-between py-5">
+            {/* Logo */}
+            <div className="flex items-center shrink-0">
+              <a href="#home">
+                <img
+                  src={logoi}
+                  alt="T4 Trader"
+                  className="h-16 sm:h-18 md:h-20 lg:h-24 xl:h-28 w-auto object-contain"
+                />
+              </a>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-10 bg-white/10 backdrop-blur-md border border-white/10 px-8 py-3 rounded-full shadow-lg">
+              <a
+                href="#home"
+                className="text-sm font-medium text-white hover:text-white transition"
+              >
+                Home
+              </a>
+
+              <Link
+                to="/course"
+                className="text-sm font-medium text-white/70 hover:text-white transition"
+              >
+                Course
+              </Link>
+
+              {session && isAdmin(session.user?.email) && (
+                <Link
+                  to="/dashboard"
+                  className="text-sm font-medium text-white/70 hover:text-white transition"
+                >
+                  Dashboard
+                </Link>
+              )}
+
+              <a
+                href="#team"
+                className="text-sm font-medium text-white/70 hover:text-white transition"
+              >
+                Team
+              </a>
+
+              <a
+                href="#faq"
+                className="text-sm font-medium text-white/70 hover:text-white transition"
+              >
+                FAQs
+              </a>
+            </div>
+
+            {/* Right Side */}
+            <div className="flex items-center gap-3">
+              {session ? (
+                <UserProfile session={session} handleLogout={handleLogout} />
+              ) : (
+                <Link
+                  to="/login"
+                  className="hidden sm:flex items-center justify-center rounded-full border border-white/10 bg-white/10 backdrop-blur-md px-5 py-2.5 text-sm font-medium text-white hover:bg-white/20 transition"
+                >
+                  Register / Login
+                </Link>
+              )}
+            </div>
+          </div>
+        </nav>
 
         {/* Hero Section */}
         <section
           id="home"
           className="relative min-h-screen flex flex-col items-center justify-center pt-12 pb-8 md:pt-24 md:pb-32 overflow-hidden"
         >
-          <div className="relative z-10 text-center px-4 md:px-4 max-w-5xl mx-auto mt-1 pointer-events-none">
-            <h1 className="text-3xl sm:text-5xl md:text-[5rem] font-['Belgin'] tracking-tight leading-[1.1] mb-6 md:mb-8 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+          <div className="relative z-10 text-center px-2 md:px-4 max-w-5xl mx-auto mt-16 pointer-events-none">
+            <h1 className="text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.5rem] xl:text-[6.5rem] font-['Belgin'] tracking-tight leading-[1] mb-6 md:mb-8 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
               <StrobeText text="TRADE" className="text-accent" delay={0.2} />{" "}
               <StrobeText text="ON YOUR" className="text-white" delay={0.5} />
               <br />
@@ -146,22 +147,26 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 2, duration: 0.8 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 pointer-events-auto"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-6 pointer-events-auto"
             >
+              {/* Start Learning */}
               <Link
                 to="/course"
-                className="w-full sm:w-auto flex justify-center"
+                className="w-[190px] sm:w-auto flex justify-center"
               >
-                <Button className="w-auto px-1.5 py-1.5 h-10 md:h-[44px] rounded-full bg-white text-black hover:bg-gray-100 flex items-center justify-between sm:justify-start pl-4 md:pl-5 text-xs md:text-sm font-medium border-0 gap-2 md:gap-3 group shadow-xl hover:shadow-2xl !transition-all">
-                  Start Learning
-                  <span className="w-[28px] h-[28px] md:w-[32px] md:h-[32px] rounded-full bg-[#83d483] flex items-center justify-center border-0 group-hover:bg-[#91df91] transition-colors shadow-none text-[#113816]">
-                    <ArrowRight className="w-4 h-4 md:w-4 md:h-4" />
+                <Button className="w-full sm:w-auto h-10 md:h-[50px] rounded-full bg-white text-black hover:bg-gray-100 flex items-center justify-center px-5 md:px-6 text-sm md:text-base font-medium gap-2 group shadow-xl hover:shadow-2xl transition-all">
+                  <span>Start Learning</span>
+
+                  <span className="flex items-center justify-center w-7 h-7 md:w-9 md:h-9 rounded-full bg-[#83d483] group-hover:bg-[#91df91] transition-colors">
+                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 text-[#113816]" />
                   </span>
                 </Button>
               </Link>
+
+              {/* Free Trial */}
               <Link
                 to="/free-trial"
-                className="w-full sm:w-auto flex justify-center"
+                className="w-[190px] sm:w-auto flex justify-center"
               >
                 <Button
                   variant="outline"
@@ -276,7 +281,7 @@ export default function Home() {
         <section className="py-6 border-b border-white/5 overflow-hidden">
           <motion.div
             animate={{ x: ["-50%", "0%"] }}
-            transition={{ repeat: Infinity, duration: 100, ease: "linear" }}
+            transition={{ repeat: Infinity, duration: 35, ease: "linear" }}
             className="flex w-max whitespace-nowrap text-gray-500 font-mono font-bold uppercase tracking-widest text-sm"
           >
             {[...Array(6)].map((_, i) => (
@@ -323,98 +328,8 @@ export default function Home() {
         </section>
 
         {/* Method Section */}
-        <section
-          id="method"
-          ref={methodRef}
-          className="py-6 md:py-24 relative border-b border-white/5 bg-transparent z-10"
-        >
-          <div className="max-w-5xl mx-auto px-6 md:px-10">
-            <div className="mb-6 md:mb-16">
-              <span className="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">
-                The framework
-              </span>
 
-              <h2 className="text-3xl md:text-5xl font-bold max-w-2xl">
-                Four pillars. One repeatable process for reading any market.
-              </h2>
-
-              <p className="text-gray-400 mt-4 max-w-md">
-                T4 isn't a slogan — it's the sequence every course, drill, and
-                live session is built around, in order.
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              {[
-                {
-                  num: "T1",
-                  tag: "Timing",
-                  title: "Read price before you read headlines.",
-                  desc: "Candlestick structure, volume confirmation, and session timing — the raw inputs that tell you when a move is actually starting, not just when it's already visible.",
-                },
-                {
-                  num: "T2",
-                  tag: "Trend",
-                  title: "Trade with the current, not against it.",
-                  desc: "Multi-timeframe trend mapping, moving average confluence, and structure breaks — so you know which direction has the odds, before you open a position.",
-                },
-                {
-                  num: "T3",
-                  tag: "Trigger",
-                  title: "Rules decide. You just execute.",
-                  desc: "Rules-based entry and exit triggers with pre-defined risk per trade — removing the split-second emotional decisions that cost most beginners their edge.",
-                },
-                {
-                  num: "T4",
-                  tag: "Target",
-                  title: "Know your exit before your entry.",
-                  desc: "Position sizing, scaling out, and portfolio-level targets — the discipline layer that turns single winning trades into a compounding, repeatable process.",
-                },
-              ].map((method, i) => (
-                <div key={i} className="project-card">
-                  <GlitchHoverCard
-                    active={methodActive}
-                    className="h-full w-full flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10 py-6 md:py-8 px-8 md:px-10 rounded-3xl text-left bg-[#0a110a]/90 backdrop-blur-xl border border-white/10 group relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_rgba(201,255,0,0.25)] hover:border-[#c9ff00]/50"
-                  >
-                    {/* Background glow effect on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                    <div
-                      className="text-[4rem] md:text-[6rem] font-serif font-bold leading-none text-transparent transition-all duration-500 shrink-0"
-                      style={{
-                        WebkitTextStroke: methodActive
-                          ? "0"
-                          : "1px rgba(255,255,255,0.2)",
-                      }}
-                    >
-                      <span
-                        className={`transition-colors duration-500 ${
-                          methodActive ? "text-primary" : "text-transparent"
-                        }`}
-                      >
-                        {method.num}
-                      </span>
-                    </div>
-
-                    <div className="relative z-10 flex-1">
-                      <span className="inline-block px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full font-mono text-[10px] md:text-xs tracking-widest uppercase mb-4">
-                        {method.tag}
-                      </span>
-
-                      <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-3 text-white leading-tight">
-                        {method.title}
-                      </h3>
-
-                      <p className="text-gray-400 text-sm md:text-base max-w-2xl leading-relaxed">
-                        {method.desc}
-                      </p>
-                    </div>
-                  </GlitchHoverCard>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <FrameworkSection />
 
         {/* features section Section */}
         <section
