@@ -129,11 +129,7 @@ export default function Course() {
               <div className="text-2xl font-bold tracking-tighter mb-6">
                 <span className="text-white">T4</span><span className="text-primary font-light">Traders</span>
               </div>
-              <p className="text-gray-500 text-sm mb-6">
-                Your pathway to professional trading.<br />
-                Master the markets with<br />
-                our disciplined four-part method.
-              </p>
+              <p className="text-gray-500 text-sm mb-6">Your pathway to professional trading. Master the markets with our disciplined four-part method.</p>
               <div className="flex space-x-4">
                 <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-colors">
                   <span className="sr-only">Twitter</span>
@@ -146,6 +142,8 @@ export default function Course() {
                 </a>
               </div>
             </div>
+
+
 
             <div>
               <h4 className="font-bold mb-6 text-white">Programs</h4>

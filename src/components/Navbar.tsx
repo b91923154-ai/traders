@@ -23,7 +23,7 @@ export function Navbar({ session, handleLogout, isHome = false }: NavbarProps) {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 p-6 pt-8">
+    <nav className="fixed top-0 left-0 right-0 z-[100] p-6 pt-8 pointer-events-auto">
       <div className="max-w-[1400px] mx-auto flex items-center justify-between px-4 relative">
         <div className="flex items-center z-10">
           <a href={getHref("#home")} className="flex items-center">
