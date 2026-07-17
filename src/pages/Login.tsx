@@ -2,6 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { supabase } from "../lib/supabase";
+import {
+  generateSessionId,
+  saveActiveSession,
+  saveLocalSessionId,
+} from "../lib/session";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -35,30 +40,6 @@ export default function Login() {
     alert("Password reset link sent.");
   };
 
-  // const handleForgotPassword = async () => {
-  //   const cleanEmail = email.trim().toLowerCase();
-
-  //   console.log("Reset Email:", cleanEmail);
-
-  //   if (!cleanEmail) {
-  //     alert("Please enter your email first.");
-  //     return;
-  //   }
-
-  //   const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
-  //     redirectTo: `${window.location.origin}/reset-password`,
-  //   });
-
-  //   console.log("Reset Error:", error);
-
-  //   if (error) {
-  //     alert(error.message);
-  //     return;
-  //   }
-
-  //   alert("Password reset link sent.");
-  // };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -73,7 +54,11 @@ export default function Login() {
       email: email.trim().toLowerCase(),
       password,
     });
-    console.log("Login Session:", data.session);
+
+    console.log("Session Object:", data.session);
+    console.log("Session Keys:", Object.keys(data.session ?? {}));
+    console.log("Access Token:", data.session?.access_token);
+    console.log("Refresh Token:", data.session?.refresh_token);
 
     setLoading(false);
 
@@ -83,6 +68,21 @@ export default function Login() {
     }
 
     console.log("Logged In User:", data.user);
+
+    // Generate unique session id
+    const sessionId = generateSessionId();
+
+    // Save locally
+    saveLocalSessionId(sessionId);
+
+    // Save in database
+    try {
+      await saveActiveSession(data.user.id, sessionId);
+    } catch (err) {
+      console.error("Session Save Error:", err);
+      alert("Unable to create login session.");
+      return;
+    }
 
     alert("Login Successful!");
 

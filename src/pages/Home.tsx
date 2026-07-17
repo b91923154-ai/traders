@@ -4,7 +4,7 @@ import { GlassCard } from "../components/ui/GlassCard";
 import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
 import { StrobeText } from "../components/StrobeText";
 import { MagneticIcon } from "../components/MagneticIcon";
-
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
@@ -18,19 +18,20 @@ export default function Home() {
   const navigate = useNavigate();
 
   const [session, setSession] = useState<any>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-  const locomotiveScroll = new LocomotiveScroll({
-    lenisOptions: {
-      lerp: 0.08,
-      smoothWheel: true,
-    },
-  });
+    const locomotiveScroll = new LocomotiveScroll({
+      lenisOptions: {
+        lerp: 0.08,
+        smoothWheel: true,
+      },
+    });
 
-  return () => {
-    locomotiveScroll.destroy();
-  };
-}, []);
+    return () => {
+      locomotiveScroll.destroy();
+    };
+  }, []);
 
   useEffect(() => {
     const getSession = async () => {
@@ -116,16 +117,138 @@ export default function Home() {
             </div>
 
             {/* Right Side */}
-            <div className="flex items-center gap-3">
+            <div className="relative flex items-center gap-3">
               {session ? (
                 <UserProfile session={session} handleLogout={handleLogout} />
               ) : (
-                <Link
-                  to="/login"
-                  className="hidden sm:flex items-center justify-center rounded-full border border-white/10 bg-white/10 backdrop-blur-md px-5 py-2.5 text-sm font-medium text-white hover:bg-white/20 transition"
-                >
-                  Register / Login
-                </Link>
+                <>
+                  {/* Register/Login - 500px and above */}
+                  <Link
+                    to="/login"
+                    className="hidden min-[500px]:flex items-center justify-center rounded-full border border-white/10 bg-white/10 backdrop-blur-md px-5 py-2.5 text-sm font-medium text-white hover:bg-white/20 transition"
+                  >
+                    Register / Login
+                  </Link>
+
+                  {/* Menu Icon - Below 500px */}
+                  <button
+                    type="button"
+                    onClick={() => setIsMenuOpen(true)}
+                    className="flex min-[500px]:hidden items-center justify-center text-white"
+                    aria-label="Open menu"
+                  >
+                    <Menu size={28} />
+                  </button>
+
+                  {/* Mobile Menu Overlay */}
+                  <div
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm min-[500px]:hidden
+    transition-opacity duration-300
+    ${
+      isMenuOpen
+        ? "opacity-100 pointer-events-auto"
+        : "opacity-0 pointer-events-none"
+    }
+  `}
+                  ></div>
+
+                  {/* Mobile Side Panel */}
+                  <div
+                    className={`fixed top-0 right-0 z-[70] h-screen w-[280px] max-w-[85vw]
+    bg-[#07140c] border-l border-white/10 shadow-2xl
+    min-[500px]:hidden
+    transform transition-transform duration-300 ease-in-out
+    ${isMenuOpen ? "translate-x-0" : "translate-x-full"}
+  `}
+                  >
+                    {/* Panel Header */}
+                    <div className="flex items-center justify-between p-6 border-b border-white/10">
+                      <span className="text-lg font-semibold text-white">
+                        Menu
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="text-white/70 hover:text-white transition"
+                        aria-label="Close menu"
+                      >
+                        <X size={26} />
+                      </button>
+                    </div>
+
+                    {/* Navigation Links */}
+                    <nav className="flex flex-col p-4 gap-1">
+                      <a
+                        href="#home"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="rounded-lg px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 transition"
+                      >
+                        Home
+                      </a>
+
+                      <Link
+                        to="/course"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="rounded-lg px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 transition"
+                      >
+                        Course
+                      </Link>
+
+                      {/* Dashboard only for Admin */}
+                      {session && isAdmin(session.user?.email) && (
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="rounded-lg px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 transition"
+                        >
+                          Dashboard
+                        </Link>
+                      )}
+
+                      <a
+                        href="#team"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="rounded-lg px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 transition"
+                      >
+                        Team
+                      </a>
+
+                      <a
+                        href="#faq"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="rounded-lg px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 transition"
+                      >
+                        FAQs
+                      </a>
+
+                      {/* Divider */}
+                      <div className="my-3 border-t border-white/10" />
+
+                      {/* Authentication */}
+                      {!session && (
+                        <>
+                          <Link
+                            to="/login"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="rounded-lg px-4 py-3 text-center text-white border border-white/10 hover:bg-white/10 transition"
+                          >
+                            Login
+                          </Link>
+
+                          <Link
+                            to="/register"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="mt-2 rounded-lg px-4 py-3 text-center font-medium bg-primary text-black hover:opacity-90 transition"
+                          >
+                            Register
+                          </Link>
+                        </>
+                      )}
+                    </nav>
+                  </div>
+                </>
               )}
             </div>
           </div>
